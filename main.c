@@ -441,7 +441,7 @@ void mostrar_turnos_reservados(ListaVo lista, int* pagina) {
         total++;
         forward(&lista);
     }
-    int total_paginas = (total + 9) / 10; 
+    int total_paginas = (total + 9) / 10;
 
     // Por si se borraron turnos y la pagina guardada ya no existe
     if(*pagina > total_paginas) *pagina = total_paginas;
@@ -492,13 +492,13 @@ void ver_estado_turno(Turno t) {
     int estado = get_turno_estado(t);
     switch(estado) {
         case 0:{
-            printf("Estado del turno: Pendiente\n"); break;
+            printf("Estado del turno: Solicitado\n"); break;
         }
         case 1:{
             printf("Estado del turno: Confirmado\n"); break;
         }
         case 2:{
-            printf("Estado del turno: Completado\n"); break;
+            printf("Estado del turno: Atendido\n"); break;
         }
         case 3:{
             printf("Estado del turno: Cancelado\n"); break;
@@ -519,6 +519,22 @@ void ver_datos_turno(Turno t) {
     printf("\n");
 }
 
+void ver_turnos_asignados_mes(ListaVo listaTurnos, int mes){
+    Turno t;
+    int estado;
+    if(!isOos(listaTurnos)){
+        t = copyTurno(listaTurnos);
+        estado = get_turno_estado(t);
+        if(get_mes(get_turno_fecha(t))==mes && (estado == 0 || estado == 1)){
+                ver_datos_turno(t);
+        }
+        forward(&listaTurnos);
+        ver_turnos_asignados_mes(listaTurnos, mes);
+    }else{
+        return;
+    }
+}
+
 // ====================== FUNCIONES FECHA ======================
 void ver_fecha(Fecha f) {
     printf("Fecha: %02d/%02d/%04d %02d:%02d\n", get_dia(f), get_mes(f), get_anio(f), get_hora(f), get_minuto(f));
@@ -529,19 +545,21 @@ int main()
     ListaEpaciente listaPacientes = {0};
     ListaVo listaTurnos = {0};
     int i;
+
     for(i = 0; i < 30; i++){
     Turno t;
     Fecha f;
     init_fecha(&f);
-    // 10 turnos por dia (8:00 a 12:30), en los dias 2, 3 y 4 de noviembre
-    set_fecha(&f, 2 + i / 10, 11, 8 + (i % 10) / 2, (i % 2) * 30, 0);
+    // mes alterna entre noviembre y diciembre para probar el filtro por mes
+    int mes = (i % 2 == 0) ? 11 : 12;
+    set_fecha(&f, 2 + i / 10, mes, 8 + (i % 10) / 2, (i % 2) * 30, 0);
 
     set_turno_id(&t, i + 1);
     set_turno_dni_paciente(&t, 30000000 + i);
     set_turno_monto(&t, 5000);
     set_turno_mutual(&t, 0);
     set_turno_fecha(&t, f);
-    set_turno_estado(&t, 1);
+    set_turno_estado(&t, i % 3); // 0, 1, 2, 0, 1, 2, ...
 
     agregarTurno(&listaTurnos, t);
     }
@@ -666,8 +684,9 @@ void mostrar_menu_turnos() {
     printf("1. Nuevo turno\n");
     printf("2. Carga n turnos\n");
     printf("3. Mostrar turnos reservados\n");
-    printf("4. Modificar turno\n");
-    printf("5 Limpiar pantalla\n");
+    printf("4. Mostrar turnos reservados (por mes)\n");
+    printf("5. Modificar turno\n");
+    printf("6 Limpiar pantalla\n");
     printf("0. Volver al menu principal\n");
     printf("====================\n");
 }
@@ -710,9 +729,21 @@ void operaciones_menu_turnos(int subopcion_turnos, ListaVo *listaTurnos, Fecha a
                             break;
                         }
                         case 4:{
+                            int mes;
+                            printf("Ingrese el mes del cual quiere ver los turnos? [1]Noviembre [2]Diciembre\n");
+                            do
+                            {
+                                scanf("%d", &mes);
+                                getchar();
+                                if(mes != 1 && mes != 2){
+                                    printf("Ingrese una opcion valida.\n");
+                                }
+                            } while (mes != 1 && mes != 2);
+                            reset(listaTurnos);
+                            ver_turnos_asignados_mes(*listaTurnos, mes + 10);
                             break;
                         }
-                        case 5:{
+                        case 6:{
                             system("cls");
                             break;
                         }

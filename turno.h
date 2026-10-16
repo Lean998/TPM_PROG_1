@@ -7,7 +7,7 @@ typedef struct{
     float monto; //Solo en caso de no tener mutual
     int mutual; //[0] Ninguna [1] Mutual 1 [2] Mutual 2 [3]Mutual 3 [4] Mutual 4
     Fecha fecha; // Solo valido Noviembre a Diciembre Lun a Vier. 8 a 13hrs
-    int estado;
+    int estado; // [0] Solicitado [1] Confirmado [2] Atendido [3] Cancelado
 }Turno;
 
 void set_turno_id(Turno *t, int idTurno){
