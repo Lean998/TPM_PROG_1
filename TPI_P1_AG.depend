@@ -46,3 +46,29 @@
 
 1792089575 c:\users\casa\desktop\vs codigos\tpi_p1_ag\fecha.h
 
+1792166739 source:c:\users\casa\desktop\vs codigos\tpm_prog_1\main.c
+	<stdio.h>
+	<stdlib.h>
+	"paciente.h"
+	"listaE_paciente.h"
+	"listaVO.h"
+	"turno.h"
+
+1792112886 c:\users\casa\desktop\vs codigos\tpm_prog_1\paciente.h
+	<string.h>
+	<malloc.h>
+
+1792112886 c:\users\casa\desktop\vs codigos\tpm_prog_1\listae_paciente.h
+	<stdio.h>
+
+1792112886 c:\users\casa\desktop\vs codigos\tpm_prog_1\listavo.h
+	<stdlib.h>
+	<malloc.h>
+	<string.h>
+	"turno.h"
+
+1792165435 c:\users\casa\desktop\vs codigos\tpm_prog_1\turno.h
+	"fecha.h"
+
+1792165091 c:\users\casa\desktop\vs codigos\tpm_prog_1\fecha.h
+
