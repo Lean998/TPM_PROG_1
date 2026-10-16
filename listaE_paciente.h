@@ -1,32 +1,28 @@
-#ifndef LISTAE_PACIENTE_H
-#define LISTAE_PACIENTE_H
-
+#ifndef LISTAE_PACIENTE_H_INCLUDED
+#define LISTAE_PACIENTE_H_INCLUDED
 #include <stdio.h>
-#include <stdlib.h>
-#include "paciente.h"
-
 #define MAX_PACIENTES 100
 
 typedef struct{
-    paciente v[MAX_PACIENTES];
+    Paciente v[MAX_PACIENTES];
     int cant;
     int cur;
-} listaEpaciente;
+} ListaEpaciente;
 
-void initListaE_paciente(listaEpaciente *e){
+void initListaE_paciente(ListaEpaciente *e){
     e->cant = 0;
     e->cur = -1;
 }
 
-int EmptylistaE_paciente(listaEpaciente e){
+int EmptylistaE_paciente(ListaEpaciente e){
     return (e.cant == 0);
 }
 
-int FulllistaEpaciente(listaEpaciente e){
+int FullListaEpaciente(ListaEpaciente e){
     return (e.cant >= MAX_PACIENTES);
 }
 
-void ResetlistaEpaciente(listaEpaciente *e){
+void resetListaEpaciente(ListaEpaciente *e){
     if (e->cant > 0){
         e->cur = 0;
     } else {
@@ -34,12 +30,12 @@ void ResetlistaEpaciente(listaEpaciente *e){
     }
 }
 
-int isooslistaEpaciente(listaEpaciente e){
-    return (e.cur == -1 || e.cur >= e.cant);
+int isoosListaEpaciente(ListaEpaciente e){
+    return (e.cur < 0 || e.cur >= e.cant);
 }
 
-void forwardlistaEpaciente(listaEpaciente *e){
-    if (!isooslistaEpaciente(*e)){
+void forwardListaEpaciente(ListaEpaciente *e){
+    if (!isoosListaEpaciente(*e)){
         e->cur++;
         if (e->cur >= e->cant){
             e->cur = -1;
@@ -47,14 +43,16 @@ void forwardlistaEpaciente(listaEpaciente *e){
     }
 }
 
-void copylistaEpaciente(listaEpaciente e, paciente *p){
-    if (!isooslistaEpaciente(e)){
-        *p = e.v[e.cur];
+Paciente copyListaEpaciente(ListaEpaciente e){
+    Paciente p;
+    if (!isoosListaEpaciente(e)){
+        p = e.v[e.cur];
     }
+    return p;
 }
 
-int insertlistaEpaciente(listaEpaciente *e, paciente nuevoPaciente){
-    if (FulllistaEpaciente(*e)){
+int insertListaEpaciente(ListaEpaciente *e, Paciente nuevoPaciente){
+    if (FullListaEpaciente(*e)){
         printf("La lista estatica de pacientes esta llena.\n");
         return 0;
     }
@@ -66,9 +64,9 @@ int insertlistaEpaciente(listaEpaciente *e, paciente nuevoPaciente){
     return 1;
 }
 
-int suppresslistaEpaciente(listaEpaciente *e){
+int suppressListaEpaciente(ListaEpaciente *e){
     int i;
-    if (EmptylistaE_paciente(*e) || isooslistaEpaciente(*e)){
+    if (EmptylistaE_paciente(*e) || isoosListaEpaciente(*e)){
         printf("No hay ningun paciente seleccionado para borrar.\n");
         return 0;
     }
@@ -84,11 +82,10 @@ int suppresslistaEpaciente(listaEpaciente *e){
     return 1;
 }
 
-int buscarPacientePorDni(listaEpaciente e, long dniBuscado, paciente *pEncontrado){
+int buscarPacientePorDni(ListaEpaciente e, long dniBuscado){
     int i = 0;
     while (i < e.cant){
         if(e.v[i].dni == dniBuscado){
-            *pEncontrado = e.v[i];
             return 1;
         }
         i++;
@@ -96,4 +93,5 @@ int buscarPacientePorDni(listaEpaciente e, long dniBuscado, paciente *pEncontrad
     return 0;
 }
 
-#endif // LISTAE_PACIENTE_H
+
+#endif // LISTAE_PACIENTE_H_INCLUDED

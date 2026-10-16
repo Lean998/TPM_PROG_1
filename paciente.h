@@ -1,40 +1,50 @@
-#ifndef PACIENTE_H
-#define PACIENTE_H
-#include <stdio.h>
+#ifndef PACIENTE_H_INCLUDED
+#define PACIENTE_H_INCLUDED
 #include <string.h>
+#include <malloc.h>
 typedef struct{
-    char nombre [30];
-    char apellido [30];
-    long dni;
-    int osocial; // aca defino si tiene. 1 = si tiene y 0 = no tiene
+    char nombre[100];
+    char apellido[100];
+    long int dni;
+    int oSocial; //[0] Ninguna [1] Mutual 1 [2] Mutual 2 [3]Mutual 3 [4] Mutual 4
+}Paciente;
 
-}paciente; // defini la estructura de pacientes.
-
-void initpaciente (paciente *p){
-    strcpy(p->nombre, "");
-    strcpy(p->apellido, "");
-    p->dni = 0;
-    p->osocial = 0;
-}
-void modificarpaciente (paciente *p, char nuevonombre[], char nuevoapellido[], long nuevodni, int obrasocial){
-    strcpy(p->nombre,nuevonombre);
-    strcpy(p->apellido,nuevoapellido);
-    p->dni = nuevodni;
-    p->osocial = obrasocial;
+void set_nombre_paciente(Paciente *p, char *nombre){
+    strcpy(p->nombre, nombre);
 }
 
-void mostrarpaciente (paciente p){
-    printf("datos del paciente: \n");
-    printf("nombre: %s\n", p.nombre);
-    printf("apellido: %s\n", p.apellido);
-    printf("DNI: %ld\n", p.dni);
-    if (p.osocial == 1){
-        printf("si tiene obra social\n");
-    }
-    else{
-        printf("no tiene obra social\n");
-    }
-    printf("----------------------");
+void set_apellido_paciente(Paciente *p, char *apellido){
+    strcpy(p->apellido, apellido);
 }
 
-#endif // termino de declarar paciente.h
+void set_dni_paciente(Paciente *p, long int dni){
+    p->dni = dni;
+}
+
+void set_o_social_paciente(Paciente *p, int oSocial){
+    p->oSocial = oSocial;
+}
+
+char* get_nombre_paciente(Paciente p){
+    char *nombre;
+    nombre = (char*)malloc(sizeof(char)*strlen(p.nombre)+1);
+    strcpy(nombre, p.nombre);
+    return nombre;
+}
+
+char* get_apellido_paciente(Paciente p){
+    char *apellido;
+    apellido = (char*)malloc(sizeof(char)*strlen(p.apellido)+1);
+    strcpy(apellido, p.apellido);
+    return apellido;
+}
+
+long int get_dni_paciente(Paciente p){
+    return p.dni;
+}
+
+int get_o_social_paciente(Paciente p){
+    return p.oSocial;
+}
+
+#endif // PACIENTE_H_INCLUDED
