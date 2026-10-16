@@ -543,7 +543,9 @@ int main()
     inicializarAgenda(agenda);
 
     int opcion;
-
+    int subopcion_pacientes;
+    int subopcion_turnos;
+    int subopcion_fechas;
     printf("=== Sistema de Turnos Medicos ===\n");
 
     do {
@@ -553,62 +555,51 @@ int main()
         getchar();
         switch (opcion) {
             case 1:
-                if(isFull(listaTurnos)) {
-                    printf("\nLa lista de turnos esta llena.\n");
-                } else {
-                    Turno t = nuevo_turno(&listaTurnos, agenda, &listaPacientes);
-                    if(t.id_turno != 0) {
-                        agregarTurno(&listaTurnos, t);
-                        printf("\nTurno cargado exitosamente.\n");
-                    } else {
-                        printf("\nCarga de turno cancelada.\n");
-                    }
-                }
+            do
+            {
+                mostrar_menu_pacientes();
+                printf("Opcion: ");
+                scanf("%d", &subopcion_pacientes);
+                getchar();
+                operaciones_menu_pacientes(subopcion_pacientes, &listaPacientes);
+                } while (subopcion_pacientes != 0);
                 break;
             case 2: {
-                printf("\n--- PRIMEROS TURNOS LIBRES EN AGENDA ---\n");
-                int mostrados = 0;
-                int i;
-                for ( i = 0; i < MAX_AGENDA && mostrados < 15; i++) {
-                    if (agenda[i].disponible == 1) {
-                        printf("ID Turno (Indice): %3d | Fecha: %02d/%02d/%d - %02d:%02d\n",
-                            i, agenda[i].dia, agenda[i].mes, agenda[i].anio, agenda[i].hora, agenda[i].minuto);
-                        mostrados++;
-                    }
-                }
-                printf("(Mostrando los primeros 15 turnos libres disponibles)\n");
+                do
+                {
+                    mostrar_menu_turnos();
+                    printf("Opcion: ");
+                    scanf("%d", &subopcion_turnos);
+                    getchar();
+                    operaciones_menu_turnos(subopcion_turnos, &listaTurnos, agenda, &listaPacientes);
+                    } while (subopcion_turnos != 0);
                 }
                 break;
             case 3:{
-                printf("\n[ c ] Mostrar los datos de los turnos de un paciente de acuerdo al dni - (por implementar)\n");
-                pausa();
-                }break;
+                do
+                {
+                    mostrar_menu_fechas();
+                    printf("Opcion: \n");
+                    scanf("%d", &subopcion_fechas);
+                    getchar();
+                    operaciones_menu_fechas(subopcion_fechas, agenda);
+                    }while (subopcion_fechas != 0);
+                }
+                break;
             case 4:{
-                nuevo_paciente(&listaPacientes);
-                pausa();
-                }break;
-            case 5:{
-                mostrar_pacientes(&listaPacientes);
-                pausa();
-                }break;
-            case 6:{
-                mostrar_turnos_reservados(listaTurnos);
-                pausa();
-                }break;
-            case 7:{
                 system("cls");
-                }break;
+                break;
+            }
             case 0:{
                 printf("\nSaliendo...\n");
                 }break;
             default:{
                 }printf("\nOpcion invalida.\n");
         }
-
     } while (opcion != 0);
     return 0;
-
 }
+
 
 void inicializarAgenda(Fecha agenda[MAX_AGENDA]) {
     int dia = 1;
@@ -668,15 +659,159 @@ void inicializarAgenda(Fecha agenda[MAX_AGENDA]) {
 // ====================== MENÚ ======================
 void mostrar_menu() {
     printf("\n========== MENU ==========\n");
-    printf("1. Solicitar turno\n");
-    printf("2. Buscar fechas libres\n");
-    printf("3. Turnos de un paciente\n");
-    printf("4. Cargar paciente\n");
-    printf("5. Mostrar todos los pacientes\n");
-    printf("6. Mostrar turnos reservados\n");
-    printf("7. Limpiar pantalla\n");
+    printf("1. Pacientes\n");
+    printf("2. Turnos\n");
+    printf("3. Fechas\n");
+    printf("4. Limpiar pantalla\n");
     printf("0. Salir\n");
     printf("==========================\n");
+}
+
+void mostrar_menu_pacientes() {
+    printf("\n=== Menu Pacientes ===\n");
+    printf("1. Nuevo paciente\n");
+    printf("2. Modificar paciente\n");
+    printf("3. Mostrar pacientes\n");
+    printf("4. Limpiar pantalla\n");
+    printf("0. Volver al menu principal\n");
+    printf("======================\n");
+}
+
+void operaciones_menu_pacientes(int subopcion_pacientes, ListaEpaciente* listaPacientes){
+    switch (subopcion_pacientes) {
+                    case 1:{
+                        nuevo_paciente(listaPacientes);
+                        pausa();
+                        break;
+                    }
+                    case 2:{
+                        // Implementar modificar paciente
+                        break;
+                    }
+                    case 3:{
+                        mostrar_pacientes(listaPacientes);
+                        break;
+                    }
+                    case 4:{
+                        system("cls");
+                        break;
+                    }
+                    case 0:{
+                        printf("\nVolviendo...\n");
+                        break;
+                    }
+                    default:{
+                        printf("Opcion invalida.\n");
+                        break;
+                    }
+                }
+}
+
+void mostrar_menu_turnos() {
+    printf("\n=== Menu Turnos ===\n");
+    printf("1. Nuevo turno\n");
+    printf("2. Carga n turnos\n");
+    printf("3. Mostrar turnos reservados\n");
+    printf("4. Modificar turno\n");
+    printf("5 Limpiar pantalla\n");
+    printf("0. Volver al menu principal\n");
+    printf("====================\n");
+}
+
+void operaciones_menu_turnos(int subopcion_turnos, ListaVo *listaTurnos, Fecha agenda[], ListaEpaciente *listaPacientes){
+    switch (subopcion_turnos) {
+                        case 1:{
+                            if(isFull(*listaTurnos)) {
+                                printf("\nLa lista de turnos esta llena.\n");
+                            } else {
+                                Turno t = nuevo_turno(listaTurnos, agenda, listaPacientes);
+                                if(t.id_turno != 0) {
+                                    agregarTurno(listaTurnos, t);
+                                    printf("\nTurno cargado exitosamente.\n");
+                                } else {
+                                    printf("\nCarga de turno cancelada.\n");
+                                }
+                            }
+                            break;
+                        }
+                        case 2:{
+                            int n;
+                            printf("Ingrese la cantidad de turnos a cargar: ");
+                            //Controlar que se ingrese una cantidad valida.
+                            do {
+                                scanf("%d", &n);
+                                getchar();
+                                if(n <= 0) {
+                                    printf("La cantidad debe ser mayor a 0. Ingrese nuevamente: ");
+                                } else if(n > MAX_TURNOS) {
+                                    printf("La cantidad no puede superar %d. Ingrese nuevamente: ", MAX_TURNOS);
+                                }
+                            } while(n <= 0 || n > MAX_TURNOS);
+                            carga_n_turnos(listaTurnos, agenda, listaPacientes, n);
+                            break;
+                        }
+                        case 3:{
+                            mostrar_turnos_reservados(*listaTurnos);
+                            pausa();
+                            break;
+                        }
+                        case 4:{
+                            break;
+                        }
+                        case 5:{
+                            system("cls");
+                            break;
+                        }
+                        case 0:{
+                            printf("\nVolviendo...\n");
+                            break;
+                        }
+                        default:{
+                            printf("Opcion invalida.\n");
+                            break;
+                        }
+                        }
+}
+
+void mostrar_menu_fechas() {
+    printf("\n=== Menu Fechas ===\n");
+    printf("1. Buscar fechas libres\n");
+    printf("2. Mostrar fechas disponibles\n");
+    printf("3. Limpiar pantalla\n");
+    printf("0. Volver al menu principal\n");
+    printf("====================\n");
+}
+void operaciones_menu_fechas(int subopcion_fechas, Fecha agenda[]){
+    switch(subopcion_fechas){
+        case 1:{
+            break;
+        }
+        case 2:{
+            printf("\n--- PRIMERAS FECHAS LIBRES EN AGENDA ---\n");
+                            int mostrados = 0;
+                            int i;
+                            for ( i = 0; i < MAX_AGENDA && mostrados < 15; i++) {
+                                if (agenda[i].disponible == 1) {
+                                    printf("ID Turno: %3d | Fecha: %02d/%02d/%d - %02d:%02d\n",
+                                        i, agenda[i].dia, agenda[i].mes, agenda[i].anio, agenda[i].hora, agenda[i].minuto);
+                                    mostrados++;
+                                }
+                            }
+                            printf("(Mostrando las primeras 15 fechas disponibles)\n");
+            break;
+        }
+        case 3:{
+            system("cls");
+            break;
+        }
+        case 0:{
+                printf("\nVolviendo...\n");
+                break;
+                }
+        default:{
+            printf("Opcion invalida.\n");
+        }
+    }
 }
 
 void pausa() {
