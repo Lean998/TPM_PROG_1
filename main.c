@@ -7,7 +7,36 @@
 #define MAX_AGENDA 390
 #define MAX_PACIENTES 100
 #define MAX_TURNOS 390
-
+//===================== PROTOTIPOS ======================
+void inicializarAgenda(Fecha agenda[MAX_AGENDA]);
+void leer_texto(char *mensaje, char *destino, int tam);
+void nuevo_paciente(ListaEpaciente *lista);
+void modificar_nombre_paciente(Paciente *p, char *nuevo_nombre);
+void modificar_apellido_paciente(Paciente *p, char *nuevo_apellido);
+void modificar_dni_paciente(Paciente *p, long int nuevo_dni);
+void modificar_o_social_paciente(Paciente *p, int nuevo_oSocial);
+void ver_o_social_paciente(Paciente p);
+void mostrar_datos_paciente(Paciente p);
+void mostrar_pacientes(ListaEpaciente *lista);
+Turno nuevo_turno(ListaVo *listaT, Fecha agenda[], ListaEpaciente *listaP);
+void carga_n_turnos(ListaVo *listaT, Fecha agenda[], ListaEpaciente *listaP, int n);
+void modificar_id_turno(ListaVo listaT, Turno *t, int nuevo_id);
+void modificar_dni_turno(Turno *t, ListaEpaciente listaP, long int nuevo_dni);
+void modificar_monto_turno(Turno *t, float nuevo_monto);
+void modificar_mutual_turno(Turno *t, int nuevo_mutual);
+void modificar_fecha_turno(Turno *t, Fecha nueva_fecha, Fecha agenda[], int tamanio_agenda);
+void modificar_estado_turno(Turno *t, int nuevo_estado);
+void ver_o_social_turno(Turno t);
+void mostrar_turnos_reservados(ListaVo lista);
+void ver_estado_turno(Turno t);
+void ver_datos_turno(Turno t);
+void ver_fecha(Fecha f);
+int fecha_valida(Fecha f);
+int fecha_disponible(Fecha f, int tamanio_agenda, Fecha agenda[]);
+int indice_fecha(Fecha f, int tamanio_agenda, Fecha agenda[]);
+int main(void);
+void mostrar_menu(void);
+void pausa(void);
 //====================== FUNCIONES AUXILIARES ======================
 //Funcion para manejar la entrada de texto.
 void leer_texto(char *mensaje, char *destino, int tam){
@@ -505,15 +534,13 @@ int indice_fecha(Fecha f, int tamanio_agenda, Fecha agenda[]) {
     return -1; // La fecha no existe en la agenda
 }
 
-
-
 int main()
 {
-    Fecha agenda[MAX_AGENDA];
     ListaEpaciente listaPacientes = {0};
     ListaVo listaTurnos = {0};
 
-    inicializarAgenda(agenda, MAX_AGENDA);
+    Fecha agenda[MAX_AGENDA];
+    inicializarAgenda(agenda);
 
     int opcion;
 
@@ -538,43 +565,44 @@ int main()
                     }
                 }
                 break;
-            case 2:
-                 printf("\n--- PRIMEROS TURNOS LIBRES EN AGENDA ---\n");
+            case 2: {
+                printf("\n--- PRIMEROS TURNOS LIBRES EN AGENDA ---\n");
                 int mostrados = 0;
                 int i;
                 for ( i = 0; i < MAX_AGENDA && mostrados < 15; i++) {
                     if (agenda[i].disponible == 1) {
                         printf("ID Turno (Indice): %3d | Fecha: %02d/%02d/%d - %02d:%02d\n",
-                               i, agenda[i].dia, agenda[i].mes, agenda[i].anio, agenda[i].hora, agenda[i].minuto);
+                            i, agenda[i].dia, agenda[i].mes, agenda[i].anio, agenda[i].hora, agenda[i].minuto);
                         mostrados++;
                     }
                 }
                 printf("(Mostrando los primeros 15 turnos libres disponibles)\n");
+                }
                 break;
-            case 3:
+            case 3:{
                 printf("\n[ c ] Mostrar los datos de los turnos de un paciente de acuerdo al dni - (por implementar)\n");
                 pausa();
-                break;
-            case 4:
+                }break;
+            case 4:{
                 nuevo_paciente(&listaPacientes);
                 pausa();
-                break;
-            case 5:
+                }break;
+            case 5:{
                 mostrar_pacientes(&listaPacientes);
                 pausa();
-                break;
-            case 6:
+                }break;
+            case 6:{
                 mostrar_turnos_reservados(listaTurnos);
                 pausa();
-                break;
-            case 7:
+                }break;
+            case 7:{
                 system("cls");
-                break;
-            case 0:
+                }break;
+            case 0:{
                 printf("\nSaliendo...\n");
-                break;
-            default:
-                printf("\nOpcion invalida.\n");
+                }break;
+            default:{
+                }printf("\nOpcion invalida.\n");
         }
 
     } while (opcion != 0);
