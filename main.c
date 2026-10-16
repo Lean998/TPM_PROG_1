@@ -4,7 +4,6 @@
 #include "listaE_paciente.h"
 #include "listaVO.h"
 #include "turno.h"
-#define MAX_AGENDA 390
 #define MAX_PACIENTES 100
 #define MAX_TURNOS 390
 //===================== PROTOTIPOS ======================
@@ -37,6 +36,7 @@ int indice_fecha(Fecha f, int tamanio_agenda, Fecha agenda[]);
 int main(void);
 void mostrar_menu(void);
 void pausa(void);
+
 //====================== FUNCIONES AUXILIARES ======================
 //Funcion para manejar la entrada de texto.
 void leer_texto(char *mensaje, char *destino, int tam){
@@ -524,60 +524,6 @@ void ver_fecha(Fecha f) {
     printf("Fecha: %02d/%02d/%04d %02d:%02d\n", get_dia(f), get_mes(f), get_anio(f), get_hora(f), get_minuto(f));
 }
 
-int fecha_valida(Fecha f) {
-    int dia = get_dia(f);
-    int mes = get_mes(f);
-    int anio = get_anio(f);
-    int hora = get_hora(f);
-    int minuto = get_minuto(f);
-
-    // Validar año
-    if(anio != 2026) return 0;
-
-    // Validar mes
-    if(mes < 11 || mes > 12) return 0;
-
-    // Validar día según el mes
-    if(mes == 11 && (dia < 1 || dia > 30)) return 0; // Noviembre tiene 30 días
-    if(mes == 12 && (dia < 1 || dia > 31)) return 0; // Diciembre tiene 31 días
-
-    // Validar hora y minuto
-    if(hora < 8 || hora > 12) return 0; // Horario permitido: 8 a 12 hrs (a consultar si se dan turnos a las 13)
-    if(minuto != 0 && minuto != 30) return 0; // Minutos permitidos: 0 o 30
-
-    return 1; // Fecha válida
-}
-
-int fecha_disponible(Fecha f, int tamanio_agenda, Fecha agenda[]) {
-    int i;
-    for(i = 0; i < tamanio_agenda; i++) {
-            if(agenda[i].dia == f.dia &&
-                agenda[i].mes == f.mes &&
-                agenda[i].hora == f.hora &&
-                agenda[i].minuto == f.minuto) {
-                if(agenda[i].disponible == 1) {
-                    return 1; // Disponible
-                } else {
-                    return 0; // No disponible
-                }
-            }
-        }
-    return 0; // La fecha no existe en la agenda
-}
-
-int indice_fecha(Fecha f, int tamanio_agenda, Fecha agenda[]) {
-    int i;
-    for(i = 0; i < tamanio_agenda; i++) {
-        if(agenda[i].dia == f.dia &&
-            agenda[i].mes == f.mes &&
-            agenda[i].hora == f.hora &&
-            agenda[i].minuto == f.minuto) {
-            return i; // Retorna el índice de la fecha en la agenda
-        }
-    }
-    return -1; // La fecha no existe en la agenda
-}
-
 int main()
 {
     ListaEpaciente listaPacientes = {0};
@@ -663,60 +609,6 @@ int main()
 }
 
 
-void inicializarAgenda(Fecha agenda[MAX_AGENDA]) {
-    int dia = 1;
-    int mes = 11;
-    int anio = 2026;
-
-    // ya que el codigo nos dice que empiza el 1 de noviembre y cae domingo nos quedaria asi:
-    // 0=Dom, 1=Lun, 2=Mar, 3=Mie, 4=Jue, 5=Vie, 6=Sab
-    int diaSemana = 0;
-
-    int index = 0; // creamos un indice para agende de 0 al 389
-
-    while (index < MAX_AGENDA) {
-        // como trabaja de lunes a viernes nuestro diaSemana tiene que estar entre esos rangos
-        if (diaSemana >= 1 && diaSemana <= 5) {
-            int hora = 8;
-            int minuto = 0;
-            int t;
-
-            // aca generamos los 10 turnos que va a contener ese dia. desde las 8:00am hasta las 12:30pm
-            for (t = 0; t < 10 && index < MAX_AGENDA; t++) {
-                agenda[index].dia = dia;
-                agenda[index].mes = mes;
-                agenda[index].anio = anio;
-                agenda[index].hora = hora;
-                agenda[index].minuto = minuto;
-                agenda[index].disponible = 1; // anteriormente tenemos que 1 significaba libre
-
-                index++; // aca paso al siguiente casillero de la agenda
-
-                // como los turnos son cada 30 minutos, le incremento 30 para el siguiente turno
-                minuto += 30;
-                if (minuto >= 60) { // comparo los minutos y en caso de ser mayor o igual a60
-                    minuto = 0;     //restaurmanos minutos a 0 y le sumamos +1 a horas
-                    hora++;
-                }
-            }
-        }
-
-        // pasamos al siguiente dia del calendiario
-        dia++;
-        diaSemana = (diaSemana + 1) % 7; // aca avanza el dia de la semana de una forma circular de 0 a 6
-
-        // controlo fin de mes ya que noviembre tiene 30 dias y diciembre tiene 31
-        int diasMaximos = (mes == 11) ? 30 : 31;
-        if (dia > diasMaximos) {
-            dia = 1;
-            mes++;
-            if (mes > 12) {
-                mes = 1;
-                anio++;
-            }
-        }
-    }
-}
 
 // ====================== MENÚ ======================
 void mostrar_menu() {
