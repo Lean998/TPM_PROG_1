@@ -27,7 +27,7 @@ void modificar_mutual_turno(Turno *t, int nuevo_mutual);
 void modificar_fecha_turno(Turno *t, Fecha nueva_fecha, Fecha agenda[], int tamanio_agenda);
 void modificar_estado_turno(Turno *t, int nuevo_estado);
 void ver_o_social_turno(Turno t);
-void mostrar_turnos_reservados(ListaVo lista);
+void mostrar_turnos_reservados(ListaVo lista, int* pagina);
 void ver_estado_turno(Turno t);
 void ver_datos_turno(Turno t);
 void ver_fecha(Fecha f);
@@ -285,7 +285,7 @@ void carga_n_turnos(ListaVo *listaT, Fecha agenda[], ListaEpaciente *listaP, int
         if(i < n - 1) {
             char continuar;
             do {
-                printf("¿Desea cargar otro turno? (s/n): ");
+                printf("Desea cargar otro turno? (s/n): ");
                 scanf(" %c", &continuar);
                 getchar();
                 if(continuar != 's' && continuar != 'S' && continuar != 'n' && continuar != 'N') {
@@ -429,19 +429,63 @@ void ver_o_social_turno(Turno t) {
     }
 }
 
-void mostrar_turnos_reservados(ListaVo lista) {
-    Turno t;
+void mostrar_turnos_reservados(ListaVo lista, int* pagina) {
     if(isEmpty(lista)) {
         printf("No hay turnos reservados.\n");
         return;
     }
+    // Contar turnos para calcular la cantidad de paginas
+    int total = 0;
     reset(&lista);
-    printf("=== Turnos Reservados ===\n");
     while(!isOos(lista)) {
-        t = copyTurno(lista);
-        ver_datos_turno(t);
+        total++;
         forward(&lista);
     }
+    int total_paginas = (total + 9) / 10; 
+
+    // Por si se borraron turnos y la pagina guardada ya no existe
+    if(*pagina > total_paginas) *pagina = total_paginas;
+    if(*pagina < 1) *pagina = 1;
+
+    int i;
+    char opcion;
+    do {
+        // Posicionar el cursor al inicio de la pagina
+        reset(&lista);
+        for(i = 0; i < (*pagina - 1) * 10; i++) {
+            forward(&lista);
+        }
+
+        // Mostrar hasta 10 turnos
+        printf("=== Turnos Reservados ===\n");
+        for(i = 0; i < 10 && !isOos(lista); i++) {
+            ver_datos_turno(copyTurno(lista));
+            forward(&lista);
+        }
+        printf("=== Pagina %d / %d ===\n", *pagina, total_paginas);
+        int valida;
+        do {
+            printf("[S]iguiente  [A]nterior  [N] Salir: ");
+            scanf(" %c", &opcion);
+            getchar();
+            if( valida = (opcion == 'n' || opcion == 'N') ||
+                     ((opcion == 's' || opcion == 'S') && *pagina < total_paginas) ||
+                     ((opcion == 'a' || opcion == 'A') && *pagina > 1)); {
+            }
+            if(!valida) {
+                if((opcion == 'a' || opcion == 'A') && *pagina <= 1){
+                    printf("No puede retroceder mas paginas.\n");
+                }else if((opcion == 's' || opcion == 'S') &&  *pagina >= total_paginas){
+                    printf("No puede avanzar mas paginas.\n");
+                }else{
+                    printf("Opcion invalida.\n");
+                }
+            }
+        } while(!valida);
+
+        if(opcion == 's' || opcion == 'S') (*pagina)++;
+        else if(opcion == 'a' || opcion == 'A') (*pagina)--;
+    } while(opcion != 'n' && opcion != 'N');
 }
 
 void ver_estado_turno(Turno t) {
@@ -538,6 +582,23 @@ int main()
 {
     ListaEpaciente listaPacientes = {0};
     ListaVo listaTurnos = {0};
+    int i;
+    for(i = 0; i < 30; i++){
+    Turno t;
+    Fecha f;
+    init_fecha(&f);
+    // 10 turnos por dia (8:00 a 12:30), en los dias 2, 3 y 4 de noviembre
+    set_fecha(&f, 2 + i / 10, 11, 8 + (i % 10) / 2, (i % 2) * 30, 0);
+
+    set_turno_id(&t, i + 1);
+    set_turno_dni_paciente(&t, 30000000 + i);
+    set_turno_monto(&t, 5000);
+    set_turno_mutual(&t, 0);
+    set_turno_fecha(&t, f);
+    set_turno_estado(&t, 1);
+
+    agregarTurno(&listaTurnos, t);
+    }
 
     Fecha agenda[MAX_AGENDA];
     inicializarAgenda(agenda);
@@ -546,6 +607,7 @@ int main()
     int subopcion_pacientes;
     int subopcion_turnos;
     int subopcion_fechas;
+    int pagina_turnos = 1;
     printf("=== Sistema de Turnos Medicos ===\n");
 
     do {
@@ -571,7 +633,7 @@ int main()
                     printf("Opcion: ");
                     scanf("%d", &subopcion_turnos);
                     getchar();
-                    operaciones_menu_turnos(subopcion_turnos, &listaTurnos, agenda, &listaPacientes);
+                    operaciones_menu_turnos(subopcion_turnos, &listaTurnos, agenda, &listaPacientes, &pagina_turnos);
                     } while (subopcion_turnos != 0);
                 }
                 break;
@@ -718,7 +780,7 @@ void mostrar_menu_turnos() {
     printf("====================\n");
 }
 
-void operaciones_menu_turnos(int subopcion_turnos, ListaVo *listaTurnos, Fecha agenda[], ListaEpaciente *listaPacientes){
+void operaciones_menu_turnos(int subopcion_turnos, ListaVo *listaTurnos, Fecha agenda[], ListaEpaciente *listaPacientes, int* pagina_turnos){
     switch (subopcion_turnos) {
                         case 1:{
                             if(isFull(*listaTurnos)) {
@@ -751,7 +813,7 @@ void operaciones_menu_turnos(int subopcion_turnos, ListaVo *listaTurnos, Fecha a
                             break;
                         }
                         case 3:{
-                            mostrar_turnos_reservados(*listaTurnos);
+                            mostrar_turnos_reservados(*listaTurnos, pagina_turnos);
                             pausa();
                             break;
                         }
