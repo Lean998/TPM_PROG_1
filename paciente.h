@@ -6,7 +6,7 @@ typedef struct{
     char nombre[100];
     char apellido[100];
     long int dni;
-    int oSocial; //[0] Ninguna [1] Mutual 1 [2] Mutual 2 [3]Mutual 3 [4] Mutual 4
+    int oSocial; //[0] No tiene [1] Tiene
 }Paciente;
 
 void set_nombre_paciente(Paciente *p, char *nombre){
