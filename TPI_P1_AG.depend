@@ -72,3 +72,29 @@
 
 1793292446 c:\users\casa\desktop\vs codigos\tpm_prog_1\fecha.h
 
+1793308594 source:d:\documentos\github\tpm_prog_1\main.c
+	<stdio.h>
+	<stdlib.h>
+	"paciente.h"
+	"listaE_paciente.h"
+	"listaVO.h"
+	"turno.h"
+
+1793308594 d:\documentos\github\tpm_prog_1\paciente.h
+	<string.h>
+	<malloc.h>
+
+1793308135 d:\documentos\github\tpm_prog_1\listae_paciente.h
+	<stdio.h>
+
+1793308135 d:\documentos\github\tpm_prog_1\listavo.h
+	<stdlib.h>
+	<malloc.h>
+	<string.h>
+	"turno.h"
+
+1793308594 d:\documentos\github\tpm_prog_1\turno.h
+	"fecha.h"
+
+1793308135 d:\documentos\github\tpm_prog_1\fecha.h
+

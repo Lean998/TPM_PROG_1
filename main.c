@@ -77,7 +77,7 @@ void nuevo_paciente(ListaEpaciente *lista){
         }
     } while(dni < 10000000 || dni > 99999999);
 
-    printf("Tiene obra social? [1]Si [2]No: ");
+    printf("Tiene obra social? [1]Si [0]No: ");
     do {
         scanf("%d", &oSocial);
         getchar();
@@ -1000,7 +1000,7 @@ int main()
 
     Fecha agenda[MAX_AGENDA];
     inicializarAgenda(agenda);
-    
+
     int opcion;
     int subopcion_pacientes;
     int subopcion_turnos;
