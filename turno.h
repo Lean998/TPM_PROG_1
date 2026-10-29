@@ -10,6 +10,15 @@ typedef struct{
     int estado; // [0] Solicitado [1] Confirmado [2] Atendido [3] Cancelado
 }Turno;
 
+void init_turno(Turno* t){
+    t->id_turno = -1;
+    t->dni_paciente = -1;
+    t->monto = -1;
+    t->mutual = -1;
+    init_fecha(&t->fecha);
+    t->estado = -1;
+}
+
 void set_turno_id(Turno *t, int idTurno){
     t->id_turno = idTurno;
 }
