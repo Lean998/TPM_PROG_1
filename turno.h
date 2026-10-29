@@ -1,6 +1,9 @@
 #ifndef TURNO_H_INCLUDED
 #define TURNO_H_INCLUDED
+
+#include <string.h>
 #include "fecha.h"
+
 typedef struct{
     int id_turno;
     long int dni_paciente;
@@ -22,41 +25,64 @@ void init_turno(Turno* t){
 void set_turno_id(Turno *t, int idTurno){
     t->id_turno = idTurno;
 }
+
 void set_turno_dni_paciente(Turno *t, long int dniPaciente){
     t->dni_paciente = dniPaciente;
 }
+
 void set_turno_monto(Turno *t, float monto){
-    t->monto = monto;
+    if (monto >= 0) {
+        t->monto = monto;
+    }
 }
+
 void set_turno_mutual(Turno *t, int mutual){
-    t->mutual = mutual;
+    if (mutual >= 0 && mutual <= 4) {
+        t->mutual = mutual;
+    }
 }
+
 void set_turno_fecha(Turno *t, Fecha fecha){
     t->fecha = fecha;
 }
+
 void set_turno_estado(Turno *t, int estado){
+    // por restriccion del pmi si ya esta atendido, no se deber�a modificar arbitrariamente
     t->estado = estado;
 }
 
+// Gets
 int get_turno_id(Turno t){
     return t.id_turno;
 }
+
 long int get_turno_dni_paciente(Turno t){
     return t.dni_paciente;
 }
+
 float get_turno_monto(Turno t){
     return t.monto;
 }
+
 int get_turno_mutual(Turno t){
     return t.mutual;
 }
+
 Fecha get_turno_fecha(Turno t){
     return t.fecha;
 }
+
 int get_turno_estado(Turno t){
     return t.estado;
 }
 
-
+// funcion de validar por la restriccion de �pmi
+int es_turno_modificable(Turno t) {
+    // Si el turno est� en atendido, no puede carbiarse segun el enunciado
+    if (t.estado == 2) {
+        return 0;
+    }
+    return 1;
+}
 
 #endif // TURNO_H_INCLUDED
