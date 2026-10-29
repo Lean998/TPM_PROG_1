@@ -70,21 +70,21 @@ void nuevo_paciente(ListaEpaciente *lista){
             return; // Cancelar la carga del paciente
         }
         if(dni < 10000000 || dni > 99999999) {
-            printf("El DNI debe tener 8 dígitos. Ingrese nuevamente: ");
+            printf("El DNI debe tener 8 digitos. Ingrese nuevamente: ");
         }else if(buscarPacientePorDni(*lista, dni) == 1) { // Si el paciente ya existe
             printf("El paciente con DNI %d ya existe. Ingrese otro DNI o salga (0) ", dni);
             dni = -1; // Forzar la repetición
         }
     } while(dni < 10000000 || dni > 99999999);
 
-    printf("Ingrese la opcion de obra social (0-4): ");
+    printf("Tiene obra social? [1]Si [2]No: ");
     do {
         scanf("%d", &oSocial);
         getchar();
-        if(oSocial < 0 || oSocial > 4) {
-            printf("Opcion de obra social invalida. Ingrese nuevamente (0-4): ");
+        if(oSocial < 0 || oSocial > 1) {
+            printf("Opcion de obra social invalida. Ingrese nuevamente (0 o 1): ");
         }
-    } while(oSocial < 0 || oSocial > 4);
+    } while(oSocial < 0 || oSocial > 1);
     set_nombre_paciente(&p, nombre);
     set_apellido_paciente(&p, apellido);
     set_dni_paciente(&p, dni);
@@ -117,7 +117,7 @@ void modificar_dni_paciente(Paciente *p, long int nuevo_dni) {
 }
 
 void modificar_o_social_paciente(Paciente *p, int nuevo_oSocial) {
-    if(nuevo_oSocial >= 0 && nuevo_oSocial <= 4) {
+    if(nuevo_oSocial >= 0 && nuevo_oSocial <= 1) {
         set_o_social_paciente(p, nuevo_oSocial);
     } else {
         printf("Opcion de obra social invalida.\n");
@@ -128,22 +128,10 @@ void ver_o_social_paciente(Paciente p) {
     int oSocial = get_o_social_paciente(p);
     switch(oSocial) {
         case 0:{
-            printf("Obra social: Ninguna\n"); break;
+            printf("No tiene obra social.\n"); break;
         }
         case 1:{
-            printf("Obra social: Mutual 1\n"); break;
-        }
-        case 2:{
-            printf("Obra social: Mutual 2\n"); break;
-        }
-        case 3:{
-            printf("Obra social: Mutual 3\n"); break;
-        }
-        case 4:{
-            printf("Obra social: Mutual 4\n"); break;
-        }
-        default:{
-            printf("Obra social desconocida.\n");
+            printf("Si tiene obra social.\n"); break;
         }
     }
 }
@@ -797,34 +785,184 @@ void pausa() {
     getchar();
 }
 
+// ====================== PERSISTENCIA DE DATOS ======================
+void guardar_pacientes(ListaEpaciente pacientes[]){
+    int i;
+    FILE* archivo;
+    Paciente p;
+
+    archivo = fopen("pacientes.txt", "w");
+    if(archivo == NULL) return;
+
+    resetListaEpaciente(pacientes);
+
+    while(!isoosListaEpaciente(*pacientes)){
+        p = copyListaEpaciente(*pacientes);
+        fprintf(archivo, "%s\t%s\t%ld\t%d\n",
+            get_nombre_paciente(p),
+            get_apellido_paciente(p),
+            get_dni_paciente(p),
+            get_o_social_paciente(p)
+        );
+        forwardListaEpaciente(pacientes);
+    }
+    fclose(archivo);
+}
+
+int cargar_pacientes(ListaEpaciente pacientes[]) {
+    FILE* archivo;
+    int cargados = 0;
+    char nombre[100];
+    char apellido[100];
+    long dni;
+    int o_social;
+    Paciente p;
+
+    archivo = fopen("pacientes.txt", "r");
+    if (archivo == NULL) return 0;
+
+    while (fscanf(archivo, "%99[^\t]\t%99[^\t]\t%ld\t%d\n",
+                nombre, apellido, &dni, &o_social) == 4) {
+
+        // Construir el paciente con los datos del archivo
+        modificar_nombre_paciente(&p, nombre);
+        modificar_apellido_paciente(&p, apellido);
+        modificar_dni_paciente(&p, dni);
+        modificar_o_social_paciente(&p, o_social);
+
+        // Insertar paciente
+        insertListaEpaciente(pacientes, p);
+        cargados++;
+    }
+
+    fclose(archivo);
+    return cargados;
+}
+
+
+void guardar_turnos(ListaVo turnos[]){
+    int i;
+    Turno t;
+    Fecha f;
+    FILE* archivo;
+
+    archivo = fopen("turno.txt", "w");
+    if(archivo == NULL) return;
+
+    reset(turnos);
+    while(!isOos(*turnos)){
+        t = copyTurno(*turnos);
+        f = get_turno_fecha(t);
+        fprintf(archivo, "%d\t%ld\t%f\t%d\t%d/%d/%d %d:%d\t%d\t%d\n",
+            get_turno_id(t),
+            get_turno_dni_paciente(t),
+            get_turno_monto(t),
+            get_turno_mutual(t),
+            get_dia(f),
+            get_mes(f),
+            get_anio(f),
+            get_hora(f),
+            get_minuto(f),
+            get_disponible(f),
+            get_turno_estado(t)
+        );
+        forward(turnos);
+    }
+    fclose(archivo);
+}
+
+int cargar_turnos(ListaVo turnos[]) {
+    FILE* archivo;
+    int i=0;
+    int id, mutual, dia, mes, anio;
+    int hora, minuto, disponible, estado;
+    long dni;
+    float monto;
+    Turno t;
+    Fecha f;
+
+    archivo = fopen("turno.txt", "r");
+    if (archivo == NULL) return 0;
+    init_fecha(&f);
+    init_turno(&t);
+    while (fscanf(archivo,
+                "%d\t%ld\t%f\t%d\t%d/%d/%d %d:%d\t%d\t%d",
+                &id, &dni, &monto, &mutual,
+                &dia, &mes, &anio, &hora, &minuto,
+                &disponible, &estado) == 11) {
+
+        set_fecha(&f, dia, mes, hora, minuto, disponible);
+        set_turno_id(&t, id);
+        set_turno_dni_paciente(&t, dni);
+        set_turno_monto(&t, monto);
+        set_turno_mutual(&t, mutual);
+        set_turno_fecha(&t, f);
+        set_turno_estado(&t, estado);
+        agregarTurno(turnos, t);
+        i++;
+    }
+
+    fclose(archivo);
+    return i;
+}
+
+
+void guardar_agenda(Fecha agenda[]){
+    int i;
+    FILE* archivo = fopen("agenda.txt", "w");
+    if(archivo == NULL) return;
+
+    for(i=0; i < MAX_AGENDA; i++){
+        fprintf(archivo, "%d/%d/%d %d:%d\t%d\n",
+            get_dia(agenda[i]),
+            get_mes(agenda[i]),
+            get_anio(agenda[i]),
+            get_hora(agenda[i]),
+            get_minuto(agenda[i]),
+            get_disponible(agenda[i])
+        );
+    }
+    fclose(archivo);
+}
+
+int cargar_agenda(Fecha agenda[]) {
+    int i = 0;
+    int dia, mes, anio, hora, minuto, disponible;
+
+    FILE* archivo = fopen("agenda.txt", "r");
+    if (archivo == NULL) return 0;
+
+    while (i < MAX_AGENDA &&
+        fscanf(archivo, "%d/%d/%d %d:%d\t%d",
+                &dia, &mes, &anio,
+                &hora, &minuto, &disponible) == 6) {
+
+        set_dia(&agenda[i], dia);
+        set_mes(&agenda[i], mes);
+        agenda[i].anio = anio; //2026
+        set_hora(&agenda[i], hora);
+        set_minutos(&agenda[i], minuto);
+        set_disponible(&agenda[i], disponible);
+        i++;
+    }
+
+    fclose(archivo);
+    return i;
+}
+
+
 
 int main()
 {
     ListaEpaciente listaPacientes = {0};
     ListaVo listaTurnos = {0};
     int i;
-    /* Este bloque de codigo genera 30 turnos para probar
-    for(i = 0; i < 30; i++){
-    Turno t;
-    Fecha f;
-    init_fecha(&f);
-    // mes alterna entre noviembre y diciembre para probar el filtro por mes
-    int mes = (i % 2 == 0) ? 11 : 12;
-    set_fecha(&f, 2 + i / 10, mes, 8 + (i % 10) / 2, (i % 2) * 30, 0);
-
-    set_turno_id(&t, i + 1);
-    set_turno_dni_paciente(&t, 30000000 + i);
-    set_turno_monto(&t, 5000);
-    set_turno_mutual(&t, 0);
-    set_turno_fecha(&t, f);
-    set_turno_estado(&t, i % 3); // 0, 1, 2, 0, 1, 2, ...
-
-    agregarTurno(&listaTurnos, t);
-    }*/
 
     Fecha agenda[MAX_AGENDA];
     inicializarAgenda(agenda);
-
+    cargar_pacientes(&listaPacientes);
+    cargar_agenda(agenda);
+    cargar_turnos(&listaTurnos);
     int opcion;
     int subopcion_pacientes;
     int subopcion_turnos;
@@ -846,6 +984,7 @@ int main()
                 scanf("%d", &subopcion_pacientes);
                 getchar();
                 operaciones_menu_pacientes(subopcion_pacientes, &listaPacientes);
+                guardar_pacientes(&listaPacientes);
                 } while (subopcion_pacientes != 0);
                 break;
             case 2: {
@@ -856,6 +995,8 @@ int main()
                     scanf("%d", &subopcion_turnos);
                     getchar();
                     operaciones_menu_turnos(subopcion_turnos, &listaTurnos, agenda, &listaPacientes, &pagina_turnos);
+                    guardar_turnos(&listaTurnos);
+                    guardar_agenda(agenda);
                     } while (subopcion_turnos != 0);
                 }
                 break;
@@ -867,6 +1008,7 @@ int main()
                     scanf("%d", &subopcion_fechas);
                     getchar();
                     operaciones_menu_fechas(subopcion_fechas, agenda);
+                    guardar_agenda(agenda);
                     }while (subopcion_fechas != 0);
                 }
                 break;
@@ -881,6 +1023,11 @@ int main()
                 }printf("\nOpcion invalida.\n");
         }
     } while (opcion != 0);
+
+    //Guardado de seguridad antes de salir.
+    guardar_pacientes(&listaPacientes);
+    guardar_turnos(&listaTurnos);
+    guardar_agenda(agenda);
     return 0;
 }
 
