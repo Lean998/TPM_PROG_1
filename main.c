@@ -563,7 +563,8 @@ void mostrar_menu() {
     printf("1. Pacientes\n");
     printf("2. Turnos\n");
     printf("3. Fechas\n");
-    printf("4. Limpiar pantalla\n");
+    printf("4. Persistencia de datos\n");
+    printf("5. Limpiar pantalla\n");
     printf("0. Salir\n");
     printf("==========================\n");
 }
@@ -785,6 +786,45 @@ void pausa() {
     getchar();
 }
 
+void mostrar_menu_persistencias(ListaVo* listaTurnos, ListaEpaciente* listaPacientes, Fecha agenda[]) {
+    int opcion;
+
+    do {
+        printf("\n--- PERSISTENCIA DE DATOS ---\n");
+        printf("1. Guardar datos del sistema\n");
+        printf("2. Cargar datos del sistema\n");
+        printf("3. Volver al menu principal\n");
+        printf("Seleccione una opcion: ");
+
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1:
+                guardar_turnos(listaTurnos);
+                guardar_pacientes(listaPacientes);
+                guardar_agenda(agenda);
+
+                printf("Backup realizado correctamente.\n");
+                break;
+
+            case 2:
+                cargar_pacientes(listaPacientes);
+                cargar_agenda(agenda);
+                cargar_turnos(listaTurnos);
+
+                printf("Carga finalizada.\n");
+                break;
+
+            case 3:
+                break;
+
+            default:
+                printf("Opcion invalida.\n");
+        }
+
+    } while (opcion != 3);
+}
+
 // ====================== PERSISTENCIA DE DATOS ======================
 void guardar_pacientes(ListaEpaciente pacientes[]){
     int i;
@@ -960,13 +1000,12 @@ int main()
 
     Fecha agenda[MAX_AGENDA];
     inicializarAgenda(agenda);
-    cargar_pacientes(&listaPacientes);
-    cargar_agenda(agenda);
-    cargar_turnos(&listaTurnos);
+    
     int opcion;
     int subopcion_pacientes;
     int subopcion_turnos;
     int subopcion_fechas;
+    int subopcion_persistencia;
     int pagina_turnos = 1;
     printf("=== Sistema de Turnos Medicos ===\n");
 
@@ -984,7 +1023,6 @@ int main()
                 scanf("%d", &subopcion_pacientes);
                 getchar();
                 operaciones_menu_pacientes(subopcion_pacientes, &listaPacientes);
-                guardar_pacientes(&listaPacientes);
                 } while (subopcion_pacientes != 0);
                 break;
             case 2: {
@@ -995,8 +1033,6 @@ int main()
                     scanf("%d", &subopcion_turnos);
                     getchar();
                     operaciones_menu_turnos(subopcion_turnos, &listaTurnos, agenda, &listaPacientes, &pagina_turnos);
-                    guardar_turnos(&listaTurnos);
-                    guardar_agenda(agenda);
                     } while (subopcion_turnos != 0);
                 }
                 break;
@@ -1008,11 +1044,13 @@ int main()
                     scanf("%d", &subopcion_fechas);
                     getchar();
                     operaciones_menu_fechas(subopcion_fechas, agenda);
-                    guardar_agenda(agenda);
                     }while (subopcion_fechas != 0);
                 }
                 break;
             case 4:{
+                mostrar_menu_persistencias(&listaTurnos, &listaPacientes, &agenda);
+            }
+            case 5:{
                 system("cls");
                 break;
             }
@@ -1024,10 +1062,6 @@ int main()
         }
     } while (opcion != 0);
 
-    //Guardado de seguridad antes de salir.
-    guardar_pacientes(&listaPacientes);
-    guardar_turnos(&listaTurnos);
-    guardar_agenda(agenda);
     return 0;
 }
 
