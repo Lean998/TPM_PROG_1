@@ -1,130 +1,106 @@
 #ifndef LISTAVO_H_INCLUDED
 #define LISTAVO_H_INCLUDED
-
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
 #include "turno.h"
+//Lista de turnos
 
 typedef struct NodoTurno{
     Turno turno;
     struct NodoTurno *siguiente;
-} NodoTurno;
+}NodoTurno;
 
 typedef struct{
     NodoTurno *acc;
     NodoTurno *cur;
     NodoTurno *aux;
-} ListaVo;
+}ListaVo;
 
 // Inicializar la lista
 void inicializarLista(ListaVo *lista){
-  //  if (lista != NULL) {
-        lista->acc = NULL;
-        lista->cur = NULL;
-        lista->aux = NULL;
-   // }
-}
-
-// compruebo si la lista esta vacia
-int isEmpty(ListaVo lista){
-    return (lista.acc == NULL);
-}
-
-// Ccompruebo si la lista esta llena
-int isFull(ListaVo lista){
-    NodoTurno *nuevoNodo = (NodoTurno*)malloc(sizeof(NodoTurno));
-    if(nuevoNodo == NULL){
-        return 1; // memoria insuficiente
-    } else {
-        free(nuevoNodo);
-        return 0; // todavia hay memoria disponible
-    }
-}
-
-// compruebo si el cursor esta fuera de la lista
-int isOos(ListaVo lista){
-    return (lista.cur == NULL);
+    lista->acc = NULL;
+    lista->cur = NULL;
+    lista->aux = NULL;
 }
 
 void agregarTurno(ListaVo *lista, Turno turno) {
-   // if (lista == NULL) return;
-
     NodoTurno *nuevoNodo = (NodoTurno*)malloc(sizeof(NodoTurno));
-    if (nuevoNodo == NULL) return; // controlo la memoria
-
     nuevoNodo->turno = turno;
     nuevoNodo->siguiente = NULL;
 
     Fecha fechaNueva = get_turno_fecha(turno);
-    //NodoTurno *anterior = NULL;
-    //NodoTurno *actual = lista->acc;
+    NodoTurno *anterior = NULL;
+    NodoTurno *actual = lista->acc;
 
-    // avanza mientrta la fecha del nodo sea menor o igual a la nueva
+    // Avanzar mientras la fecha del nodo actual sea menor o igual a la nueva
     while(actual != NULL && comparar_fechas(get_turno_fecha(actual->turno), fechaNueva) <= 0){
+        // Avanzar en la lista
         anterior = actual;
         actual = actual->siguiente;
     }
 
-    // Insertar el nuevo nodo
+    // Agregar el nuevo nodo
     nuevoNodo->siguiente = actual;
-    if(anterior == NULL){ // Va al principio l->cursor==l->aux
+    if(anterior == NULL){ // Va al principio
         lista->acc = nuevoNodo;
-        nuevoNodo->siguiente=l->cur;
-        l->cur=l->acc;
-        l->aux=l->acc;
-    } else { // Va en el medio o al final
-        aux->siguiente = nuevoNodo;
-        nuevoNodo->siguiente=l->cursor;
-        l->cur=nuevoNodo;
+    } else {// Va en el medio o al final
+        anterior->siguiente = nuevoNodo;
     }
-   // lista->cur = nuevoNodo;
-    //lista->aux = anterior;
+    lista->cur = nuevoNodo;
+    lista->aux = anterior;
 }
 
-// creo la funcion suppressturno para eliminar el turno actual posicionado en el cursor
-void suppressTurno(ListaVo *lista){
-    if (lista == NULL || isOos(*lista)) return;
+// Comprobar si la lista está vacía
+int isEmpty(ListaVo lista){
+    return (lista.acc == NULL);
+}
 
+// Comprobar si la lista está llena
+int isFull(ListaVo lista){
+    NodoTurno *nuevoNodo = (NodoTurno*)malloc(sizeof(NodoTurno));
+    if(nuevoNodo == NULL){
+        return 1; // Lista llena
+    } else {
+        free(nuevoNodo);
+        return 0; // Lista no llena
+    }
+}
+
+//Comprobar si el cursor está fuera de la lista
+int isOos(ListaVo lista){
+    return (lista.cur == NULL);
+}
+
+// Eliminar el turno actual
+void suppressTurno(ListaVo *lista){
     if(lista->cur == lista->acc){
         lista->acc = lista->cur->siguiente;
         free(lista->cur);
         lista->cur = lista->acc;
-        lista->aux= lista->acc;
-    } else {
+    }
+    else{
         lista->aux->siguiente = lista->cur->siguiente;
         free(lista->cur);
         lista->cur = lista->aux->siguiente;
     }
 }
 
-// Retornar el turno actual (con validación de seguridad)
 Turno copyTurno(ListaVo lista){
-    Turno t;
-    init_turno(&t); // Turno vacío por defecto si está OOS
-    if (!isOos(lista)) {
-        t = lista.cur->turno;
-    }
-    return t;
+    return lista.cur->turno;
 }
 
-// Reiniciar el cursor al inicio de la lista
 void reset(ListaVo *lista) {
-    if (lista != NULL) {
-        lista->cur = lista->acc;
-        lista->aux = NULL;
-    }
+    lista->cur = lista->acc;
+    lista->aux = NULL;
 }
 
-// Avanzar el cursor al siguiente nodo
 void forward(ListaVo *lista){
-   // if (lista != NULL && !isOos(*lista)) {
-        lista->aux = lista->cur;
-        lista->cur = lista->cur->siguiente;
-  //  }
+    lista->aux = lista->cur;
+    lista->cur = lista->cur->siguiente;
 }
 
-// Buscar un id_turno e indicar si existe o no (1 = Encontrado, 0 = No)
+//Buscar un id_turno e indicar si existe o no.
 int buscarIdTurno(ListaVo lista, int id_buscar) {
     reset(&lista);
     while (!isOos(lista)) {
