@@ -46,7 +46,7 @@
 
 1792089575 c:\users\casa\desktop\vs codigos\tpi_p1_ag\fecha.h
 
-1793299014 source:c:\users\casa\desktop\vs codigos\tpm_prog_1\main.c
+1793326975 source:c:\users\casa\desktop\vs codigos\tpm_prog_1\main.c
 	<stdio.h>
 	<stdlib.h>
 	"paciente.h"
@@ -54,23 +54,23 @@
 	"listaVO.h"
 	"turno.h"
 
-1793289589 c:\users\casa\desktop\vs codigos\tpm_prog_1\paciente.h
+1793323360 c:\users\casa\desktop\vs codigos\tpm_prog_1\paciente.h
 	<string.h>
 	<malloc.h>
 
-1792112886 c:\users\casa\desktop\vs codigos\tpm_prog_1\listae_paciente.h
+1793326599 c:\users\casa\desktop\vs codigos\tpm_prog_1\listae_paciente.h
 	<stdio.h>
 
-1792112886 c:\users\casa\desktop\vs codigos\tpm_prog_1\listavo.h
+1793323360 c:\users\casa\desktop\vs codigos\tpm_prog_1\listavo.h
 	<stdlib.h>
 	<malloc.h>
 	<string.h>
 	"turno.h"
 
-1793293137 c:\users\casa\desktop\vs codigos\tpm_prog_1\turno.h
+1793323360 c:\users\casa\desktop\vs codigos\tpm_prog_1\turno.h
 	"fecha.h"
 
-1793292446 c:\users\casa\desktop\vs codigos\tpm_prog_1\fecha.h
+1793323360 c:\users\casa\desktop\vs codigos\tpm_prog_1\fecha.h
 
 1793308594 source:d:\documentos\github\tpm_prog_1\main.c
 	<stdio.h>

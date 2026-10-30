@@ -82,16 +82,4 @@ int suppressListaEpaciente(ListaEpaciente *e){
     return 1;
 }
 
-int buscarPacientePorDni(ListaEpaciente e, long dniBuscado){
-    int i = 0;
-    while (i < e.cant){
-        if(e.v[i].dni == dniBuscado){
-            return 1;
-        }
-        i++;
-    }
-    return 0;
-}
-
-
 #endif // LISTAE_PACIENTE_H_INCLUDED
