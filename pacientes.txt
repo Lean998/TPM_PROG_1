@@ -1,2 +1,1 @@
-Leandro	Aguero	46333381	1
-Lucas	Hernandez	90655676	0
+Leandro	Aguero	46333381	2

@@ -46,7 +46,7 @@
 
 1792089575 c:\users\casa\desktop\vs codigos\tpi_p1_ag\fecha.h
 
-1793326975 source:c:\users\casa\desktop\vs codigos\tpm_prog_1\main.c
+1793375313 source:c:\users\agu12\onedrive\desktop\tp_pmi_p1-20261015t230344z-1-001\tp_pmi_p1\main.c
 	<stdio.h>
 	<stdlib.h>
 	"paciente.h"
@@ -54,47 +54,22 @@
 	"listaVO.h"
 	"turno.h"
 
-1793323360 c:\users\casa\desktop\vs codigos\tpm_prog_1\paciente.h
+1792650511 c:\users\agu12\onedrive\desktop\tp_pmi_p1-20261015t230344z-1-001\tp_pmi_p1\paciente.h
 	<string.h>
 	<malloc.h>
 
-1793326599 c:\users\casa\desktop\vs codigos\tpm_prog_1\listae_paciente.h
+1793371363 c:\users\agu12\onedrive\desktop\tp_pmi_p1-20261015t230344z-1-001\tp_pmi_p1\listae_paciente.h
 	<stdio.h>
 
-1793323360 c:\users\casa\desktop\vs codigos\tpm_prog_1\listavo.h
+1793371689 c:\users\agu12\onedrive\desktop\tp_pmi_p1-20261015t230344z-1-001\tp_pmi_p1\listavo.h
 	<stdlib.h>
 	<malloc.h>
 	<string.h>
 	"turno.h"
 
-1793323360 c:\users\casa\desktop\vs codigos\tpm_prog_1\turno.h
+1792650513 c:\users\agu12\onedrive\desktop\tp_pmi_p1-20261015t230344z-1-001\tp_pmi_p1\turno.h
+	<string.h>
 	"fecha.h"
 
-1793323360 c:\users\casa\desktop\vs codigos\tpm_prog_1\fecha.h
-
-1793308594 source:d:\documentos\github\tpm_prog_1\main.c
-	<stdio.h>
-	<stdlib.h>
-	"paciente.h"
-	"listaE_paciente.h"
-	"listaVO.h"
-	"turno.h"
-
-1793308594 d:\documentos\github\tpm_prog_1\paciente.h
-	<string.h>
-	<malloc.h>
-
-1793308135 d:\documentos\github\tpm_prog_1\listae_paciente.h
-	<stdio.h>
-
-1793308135 d:\documentos\github\tpm_prog_1\listavo.h
-	<stdlib.h>
-	<malloc.h>
-	<string.h>
-	"turno.h"
-
-1793308594 d:\documentos\github\tpm_prog_1\turno.h
-	"fecha.h"
-
-1793308135 d:\documentos\github\tpm_prog_1\fecha.h
+1793369591 c:\users\agu12\onedrive\desktop\tp_pmi_p1-20261015t230344z-1-001\tp_pmi_p1\fecha.h
 

@@ -74,7 +74,6 @@ int buscarPacientePorDni(ListaEpaciente e, long dniBuscado){
 }
 
 int turno_existe(ListaVo turnos, int id_turno){
-    int i = 0;
     reset(&turnos);
     Turno t;
     while(!isOos(turnos)){
@@ -99,6 +98,7 @@ void cargar_paciente_teclado(ListaEpaciente *listaP) { // AGUSTIN
     char nombre[100], apellido[100];
     Paciente p;
     getchar();
+
     // Ingreso seguro de nombre y apellido
     printf("Ingrese el nombre del paciente: ");
     fgets(nombre, sizeof(nombre), stdin);
@@ -126,29 +126,19 @@ void cargar_paciente_teclado(ListaEpaciente *listaP) { // AGUSTIN
         }
     } while (dni < 10000000 || dni > 99999999);
 
-    // Selección obligatoria de Obra Social mediante switch (op1 a op4)
+    // Selección de Obra Social (1: Tiene, 2: No tiene)
     do {
-        printf("\n--- SELECCIONE OBRA SOCIAL ---\n");
-        printf("1. Mutual Op1 (Cubre 60%% del costo)\n");
-        printf("2. Mutual Op2 (Cubre 60%% del costo)\n");
-        printf("3. Mutual Op3 (Cubre 100%% del costo)\n");
-        printf("4. Mutual Op4 (Cubre 100%% del costo)\n");
-        printf("Ingrese opcion (1-4): ");
+        printf("\n--- ¿POSEE OBRA SOCIAL? ---\n");
+        printf("1. Tiene obra social\n");
+        printf("2. No tiene obra social\n");
+        printf("Ingrese opcion (1 o 2): ");
         scanf("%d", &oSocial);
         getchar(); // Limpiar buffer
 
-        switch (oSocial) {
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-                // Opción válida
-                break;
-            default:
-                printf("Opcion invalida. Debe elegir una obra social entre 1 y 4.\n");
-                oSocial = -1; // Forzar repetición
+        if (oSocial != 1 && oSocial != 2) {
+            printf("Error: Opcion invalida. Ingrese 1 (Tiene) o 2 (No tiene).\n");
         }
-    } while (oSocial == -1);
+    } while (oSocial != 1 && oSocial != 2);
 
     // Guardar datos usando los setters del TDA Paciente
     set_nombre_paciente(&p, nombre);
@@ -159,7 +149,6 @@ void cargar_paciente_teclado(ListaEpaciente *listaP) { // AGUSTIN
     insertListaEpaciente(listaP, p);
     printf("¡Paciente cargado exitosamente al sistema!\n");
 }
-
 void mostrar_paciente_por_dni(ListaEpaciente listaP, long dniBuscado) { //AGUSTIN
     if (EmptylistaE_paciente(listaP)) {
         printf("No hay pacientes registrados.\n");
@@ -178,11 +167,11 @@ void mostrar_paciente_por_dni(ListaEpaciente listaP, long dniBuscado) { //AGUSTI
             printf("DNI: %ld\n", get_dni_paciente(p));
 
             int os = get_o_social_paciente(p);
-            printf("Obra Social: Op%d ", os);
-            if (os == 1 || os == 2) {
-                printf("(Cobertura del 60%% - Paga 40%%)\n");
-            } else if (os == 3 || os == 4) {
-                printf("(Cobertura del 100%% - No paga nada)\n");
+            if ( os == 1){
+                printf("tiene obra social\n");
+            }
+            else {
+                printf("no tiene obra social\n");
             }
             printf("--------------------------\n");
             encontrado = 1;
@@ -257,11 +246,7 @@ void mostrar_todos_los_pacientes(ListaEpaciente *listaP) { // AGUSTIN
     while (!isoosListaEpaciente(*listaP)) {
         Paciente p = copyListaEpaciente(*listaP);
 
-        printf("Nombre: %s | Apellido: %s | DNI: %ld | Obra Social: Op%d\n",
-            get_nombre_paciente(p),
-            get_apellido_paciente(p),
-            get_dni_paciente(p),
-            get_o_social_paciente(p));
+        mostrar_datos_paciente(p);
 
         forwardListaEpaciente(listaP);
     }
@@ -303,7 +288,7 @@ void modificar_o_social_paciente(Paciente *p, int nuevo_oSocial) {
 void ver_o_social_paciente(Paciente p) {
     int oSocial = get_o_social_paciente(p);
     switch(oSocial) {
-        case 0:{
+        case 2:{
             printf("No tiene obra social.\n"); break;
         }
         case 1:{
@@ -312,14 +297,15 @@ void ver_o_social_paciente(Paciente p) {
     }
 }
 
+
 void mostrar_datos_paciente(Paciente p) {
-    printf("Nombre: %s\n", get_nombre_paciente(p));
-    printf("Apellido: %s\n", get_apellido_paciente(p));
-    printf("DNI: %ld\n", get_dni_paciente(p));
-    ver_o_social_paciente(p);
+     printf("Nombre: %s | Apellido: %s | DNI: %ld | ",
+            get_nombre_paciente(p),
+            get_apellido_paciente(p),
+            get_dni_paciente(p));
+            ver_o_social_paciente(p);
     printf("\n");
 }
-
 
 // ====================== FUNCIONES TURNOS ======================
 Turno nuevo_turno(ListaVo *listaT, Fecha agenda[], ListaEpaciente *listaP) {
@@ -454,7 +440,9 @@ void carga_n_turnos(ListaVo *listaT, Fecha agenda[], ListaEpaciente *listaP, int
             printf("Carga de turno cancelada por el usuario.\n");
             break;
         }
-        agregarTurno(listaT, t);
+
+
+        insertarTurnoOrdenado(listaT, t);
         printf("Turno cargado exitosamente.\n");
 
         //Después de cargar un turno, preguntar si desea cargar otro
@@ -474,6 +462,24 @@ void carga_n_turnos(ListaVo *listaT, Fecha agenda[], ListaEpaciente *listaP, int
             }
         }
     }
+}
+
+// Lógica de negocio fuera del .h
+void insertarTurnoOrdenado(ListaVo *lista, Turno nuevoTurno) {
+    Fecha fechaNueva = get_turno_fecha(nuevoTurno);
+    reset(lista);
+
+    // 2. Avanzar mientras la fecha del turno actual sea menor o igual a la nueva
+    while (!isOos(*lista)) {
+        Turno turnoActual = copyTurno(*lista);
+        if (comparar_fechas(get_turno_fecha(turnoActual), fechaNueva) > 0) {
+            // Se encontró un turno con fecha posterior: detener el cursor en esta posición
+            break;
+        }
+        forward(lista);
+    }
+
+    agregarTurno(lista, nuevoTurno);
 }
 
 void modificar_id_turno(ListaVo listaT, Turno *t, int nuevo_id) {
@@ -644,13 +650,15 @@ void mostrar_turnos_reservados(ListaVo lista, int* pagina) {
             printf("[S]iguiente  [A]nterior  [N] Salir: ");
             scanf(" %c", &opcion);
             getchar();
+            valida = (opcion == 'n' || opcion == 'N') ||
+                     ((opcion == 's' || opcion == 'S') && *pagina < total_paginas) ||
+                     ((opcion == 'a' || opcion == 'A') && *pagina > 1);
+
             if(!valida) {
                 if((opcion == 'a' || opcion == 'A') && *pagina <= 1){
                     printf("No puede retroceder mas paginas.\n");
                 }else if((opcion == 's' || opcion == 'S') &&  *pagina >= total_paginas){
                     printf("No puede avanzar mas paginas.\n");
-                }else{
-                    printf("Opcion invalida.\n");
                 }
             }
         } while(!valida);
@@ -775,7 +783,6 @@ void operaciones_menu_pacientes(
     switch (subopcion_pacientes) {
         case 1: {
             cargar_paciente_teclado(listaPacientes);
-            pausa();
             break;
         }
         case 2: {
@@ -1314,7 +1321,6 @@ int main() {
 
     return 0;
 }
-
 
 
 

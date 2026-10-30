@@ -1,15 +1,15 @@
 #ifndef LISTAVO_H_INCLUDED
 #define LISTAVO_H_INCLUDED
+
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
 #include "turno.h"
-//Lista de turnos
 
 typedef struct NodoTurno{
     Turno turno;
     struct NodoTurno *siguiente;
-}NodoTurno;
+} NodoTurno;
 
 typedef struct{
     NodoTurno *acc;
@@ -19,88 +19,96 @@ typedef struct{
 
 // Inicializar la lista
 void inicializarLista(ListaVo *lista){
-    lista->acc = NULL;
-    lista->cur = NULL;
-    lista->aux = NULL;
+  //  if (lista != NULL) {
+        lista->acc = NULL;
+        lista->cur = NULL;
+        lista->aux = NULL;
+   // }
 }
 
-void agregarTurno(ListaVo *lista, Turno turno) {
-    NodoTurno *nuevoNodo = (NodoTurno*)malloc(sizeof(NodoTurno));
-    nuevoNodo->turno = turno;
-    nuevoNodo->siguiente = NULL;
-
-    Fecha fechaNueva = get_turno_fecha(turno);
-    NodoTurno *anterior = NULL;
-    NodoTurno *actual = lista->acc;
-
-    // Avanzar mientras la fecha del nodo actual sea menor o igual a la nueva
-    while(actual != NULL && comparar_fechas(get_turno_fecha(actual->turno), fechaNueva) <= 0){
-        // Avanzar en la lista
-        anterior = actual;
-        actual = actual->siguiente;
-    }
-
-    // Agregar el nuevo nodo
-    nuevoNodo->siguiente = actual;
-    if(anterior == NULL){ // Va al principio
-        lista->acc = nuevoNodo;
-    } else {// Va en el medio o al final
-        anterior->siguiente = nuevoNodo;
-    }
-    lista->cur = nuevoNodo;
-    lista->aux = anterior;
-}
-
-// Comprobar si la lista está vacía
+// compruebo si la lista esta vacia
 int isEmpty(ListaVo lista){
     return (lista.acc == NULL);
 }
 
-// Comprobar si la lista está llena
+// Ccompruebo si la lista esta llena
 int isFull(ListaVo lista){
     NodoTurno *nuevoNodo = (NodoTurno*)malloc(sizeof(NodoTurno));
     if(nuevoNodo == NULL){
-        return 1; // Lista llena
+        return 1; // memoria insuficiente
     } else {
         free(nuevoNodo);
-        return 0; // Lista no llena
+        return 0; // todavia hay memoria disponible
     }
 }
 
-//Comprobar si el cursor está fuera de la lista
+// compruebo si el cursor esta fuera de la lista
 int isOos(ListaVo lista){
     return (lista.cur == NULL);
 }
 
-// Eliminar el turno actual
+void agregarTurno(ListaVo *l, Turno turno) {
+   // if (lista == NULL) return;
+
+    NodoTurno *nuevoNodo = (NodoTurno*)malloc(sizeof(NodoTurno));
+    if (nuevoNodo == NULL) return; // controlo la memoria
+
+    nuevoNodo->turno = turno;
+    nuevoNodo->siguiente = l->cur;
+
+    if(l->aux == NULL){ // Va al principio l->cursor==l->aux
+        l->acc = nuevoNodo;
+        l->cur=l->acc;
+        l->aux=NULL;
+    } else { // Va en el medio o al final
+        l->aux->siguiente = nuevoNodo;
+    }
+    l->cur = nuevoNodo;
+}
+
+// creo la funcion suppressturno para eliminar el turno actual posicionado en el cursor
 void suppressTurno(ListaVo *lista){
+    if (lista == NULL || isOos(*lista)) return;
+
     if(lista->cur == lista->acc){
         lista->acc = lista->cur->siguiente;
         free(lista->cur);
         lista->cur = lista->acc;
-    }
-    else{
+        lista->aux= lista->acc;
+    } else {
         lista->aux->siguiente = lista->cur->siguiente;
         free(lista->cur);
         lista->cur = lista->aux->siguiente;
     }
 }
 
+// Retornar el turno actual (con validación de seguridad)
 Turno copyTurno(ListaVo lista){
-    return lista.cur->turno;
+    Turno t;
+    init_turno(&t); // Turno vacío por defecto si está OOS
+    if (!isOos(lista)) {
+        t = lista.cur->turno;
+    }
+    return t;
 }
 
+// Reiniciar el cursor al inicio de la lista
 void reset(ListaVo *lista) {
-    lista->cur = lista->acc;
-    lista->aux = NULL;
+    if (lista != NULL) {
+        lista->cur = lista->acc;
+        lista->aux = NULL;
+    }
 }
 
+// Avanzar el cursor al siguiente nodo
 void forward(ListaVo *lista){
-    lista->aux = lista->cur;
-    lista->cur = lista->cur->siguiente;
+    if (lista != NULL && !isOos(*lista)) {
+        lista->aux = lista->cur;
+        lista->cur = lista->cur->siguiente;
+   }
 }
 
-//Buscar un id_turno e indicar si existe o no.
+// Buscar un id_turno e indicar si existe o no (1 = Encontrado, 0 = No)
 int buscarIdTurno(ListaVo lista, int id_buscar) {
     reset(&lista);
     while (!isOos(lista)) {
