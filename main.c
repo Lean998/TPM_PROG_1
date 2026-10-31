@@ -16,6 +16,17 @@ void modificar_o_social_paciente(Paciente *p, int nuevo_oSocial);
 int main(void);
 void ver_o_social_paciente(Paciente p);
 void mostrar_datos_paciente(Paciente p);
+void modificar_id_turno(ListaVo listaT, Turno *t, int nuevo_id);
+void modificar_dni_turno(Turno *t, ListaEpaciente listaP, long int nuevo_dni);
+void modificar_dni_turno(Turno *t, ListaEpaciente listaP, long int nuevo_dni);
+void modificar_monto_turno(Turno *t, float nuevo_monto);
+void modificar_mutual_turno(Turno *t, int nuevo_mutual);
+void modificar_fecha_turno(Turno *t, Fecha nueva_fecha, Fecha agenda[], int tamanio_agenda);
+void modificar_estado_turno(Turno *t, int nuevo_estado);
+void ver_o_social_turno(Turno t);
+void ver_estado_turno(Turno t);
+void ver_datos_turno(Turno t);
+
 
 //===================== PROTOTIPOS AGUSTIN ======================
 void eliminar_paciente_sin_turnos(ListaEpaciente *listaP, ListaVo listaTurnos, long dniBuscado);
@@ -52,6 +63,8 @@ void operaciones_menu_fechas(int subopcion_fechas, Fecha agenda[]);
 void mostrar_menu_persistencias(ListaVo* listaTurnos, ListaEpaciente* listaPacientes, Fecha agenda[]);
 void mostrar_menu(void);
 void pausa(void);
+void insertarTurnoOrdenado(ListaVo *lista, Turno nuevoTurno);
+void mostrar_turnos_reservados(ListaVo lista, int* pagina) ;
 
 //===================== PROTOTIPOS EZE ======================
 Turno nuevo_turno(ListaVo *listaT, Fecha agenda[], ListaEpaciente *listaP);
