@@ -198,14 +198,7 @@ void mostrar_paciente_por_dni(ListaEpaciente listaP, long dniBuscado) { //AGUSTI
             printf("Nombre: %s\n", get_nombre_paciente(p));
             printf("Apellido: %s\n", get_apellido_paciente(p));
             printf("DNI: %ld\n", get_dni_paciente(p));
-
-            int os = get_o_social_paciente(p);
-            printf("Obra Social: Op%d ", os);
-            if (os == 1 || os == 2) {
-                printf("(Cobertura del 60%% - Paga 40%%)\n");
-            } else if (os == 3 || os == 4) {
-                printf("(Cobertura del 100%% - No paga nada)\n");
-            }
+            ver_o_social_paciente(p);
             printf("--------------------------\n");
             encontrado = 1;
             break;
@@ -268,11 +261,11 @@ void mostrar_todos_los_pacientes(ListaEpaciente *listaP) { // AGUSTIN
     printf("\n=== LISTA COMPLETA DE PACIENTES ===\n");
     while (!isoosListaEpaciente(*listaP)) {
         Paciente p = copyListaEpaciente(*listaP);
-        printf("Nombre: %s | Apellido: %s | DNI: %ld | Obra Social: Op%d\n",
+        printf("Nombre: %s | Apellido: %s | DNI: %ld | ",
             get_nombre_paciente(p),
             get_apellido_paciente(p),
-            get_dni_paciente(p),
-            get_o_social_paciente(p));
+            get_dni_paciente(p));
+            ver_o_social_paciente(p);
         forwardListaEpaciente(listaP);
     }
     printf("===================================\n");
@@ -442,7 +435,6 @@ Turno nuevo_turno(ListaVo *listaT, Fecha agenda[], ListaEpaciente *listaP) {
     set_turno_estado(&t, 0); // 0 = Solicitado
     set_turno_id(&t, indice_fecha_nueva + 1);
     agenda[indice_fecha_nueva].disponible = 0;
-
     return t;
 }
 
@@ -545,6 +537,23 @@ void mostrar_turnos_por_dni(ListaVo listaTurnos, long dniBuscado) {
     }
 }
 
+void insertarTurnoOrdenado(ListaVo *lista, Turno nuevoTurno) {
+    Fecha fechaNueva = get_turno_fecha(nuevoTurno);
+    reset(lista);
+
+    // 2. Avanzar mientras la fecha del turno actual sea menor o igual a la nueva
+    while (!isOos(*lista)) {
+        Turno turnoActual = copyTurno(*lista);
+        if (comparar_fechas(get_turno_fecha(turnoActual), fechaNueva) > 0) {
+            // Se encontró un turno con fecha posterior: detener el cursor en esta posición
+            break;
+        }
+        forward(lista);
+    }
+
+    agregarTurno(lista, nuevoTurno);
+}
+
 void carga_n_turnos(ListaVo *listaT, Fecha agenda[], ListaEpaciente *listaP, int n) {
     int i;
     for(i = 0; i < n; i++) {
@@ -557,7 +566,7 @@ void carga_n_turnos(ListaVo *listaT, Fecha agenda[], ListaEpaciente *listaP, int
             printf("Carga de turno cancelada por el usuario.\n");
             break;
         }
-        agregarTurno(listaT, t);
+        insertarTurnoOrdenado(listaT, t);
         printf("Turno cargado exitosamente.\n");
 
         if(i < n - 1) {
@@ -697,7 +706,9 @@ void mostrar_turnos_reservados(ListaVo lista, int* pagina) {
     if(*pagina > total_paginas) *pagina = total_paginas;
     if(*pagina < 1) *pagina = 1;
     int i;
+    int encontrados = 0;
     char opcion;
+    Turno turno;
     do {
         reset(&lista);
         for(i = 0; i < (*pagina - 1) * 10; i++) {
@@ -705,31 +716,41 @@ void mostrar_turnos_reservados(ListaVo lista, int* pagina) {
         }
         printf("=== Turnos Reservados ===\n");
         for(i = 0; i < 10 && !isOos(lista); i++) {
-            ver_datos_turno(copyTurno(lista));
+            turno = copyTurno(lista);
+            if(get_turno_estado(turno)==0){
+                ver_datos_turno(turno);
+                encontrados ++;
+            }
             forward(&lista);
         }
-        printf("=== Pagina %d / %d ===\n", *pagina, total_paginas);
-        int valida;
-        do {
-            printf("[S]iguiente  [A]nterior  [N] Salir: ");
-            scanf(" %c", &opcion);
-            getchar();
-            valida = (opcion == 'n' || opcion == 'N') ||
-                     ((opcion == 's' || opcion == 'S') && *pagina < total_paginas) ||
-                     ((opcion == 'a' || opcion == 'A') && *pagina > 1);
-            if(!valida) {
-                if((opcion == 'a' || opcion == 'A') && *pagina <= 1){
-                    printf("No puede retroceder mas paginas.\n");
-                }else if((opcion == 's' || opcion == 'S') &&  *pagina >= total_paginas){
-                    printf("No puede avanzar mas paginas.\n");
-                }else{
-                    printf("Opcion invalida.\n");
+        if(encontrados > 0){
+            printf("=== Pagina %d / %d ===\n", *pagina, total_paginas);
+            int valida;
+            do {
+                printf("[S]iguiente  [A]nterior  [N] Salir: ");
+                scanf(" %c", &opcion);
+                getchar();
+                valida = (opcion == 'n' || opcion == 'N') ||
+                         ((opcion == 's' || opcion == 'S') && *pagina < total_paginas) ||
+                         ((opcion == 'a' || opcion == 'A') && *pagina > 1);
+                if(!valida) {
+                    if((opcion == 'a' || opcion == 'A') && *pagina <= 1){
+                        printf("No puede retroceder mas paginas.\n");
+                    }else if((opcion == 's' || opcion == 'S') &&  *pagina >= total_paginas){
+                        printf("No puede avanzar mas paginas.\n");
+                    }else{
+                        printf("Opcion invalida.\n");
+                    }
                 }
-            }
-        } while(!valida);
+            } while(!valida);
 
-        if(opcion == 's' || opcion == 'S') (*pagina)++;
-        else if(opcion == 'a' || opcion == 'A') (*pagina)--;
+            if(opcion == 's' || opcion == 'S') (*pagina)++;
+            else if(opcion == 'a' || opcion == 'A') (*pagina)--;
+        }else{
+            printf("No hay turnos reservados!\n");
+            opcion = 'N';
+        }
+
     } while(opcion != 'n' && opcion != 'N');
 }
 
@@ -923,7 +944,7 @@ void operaciones_menu_turnos(int subopcion_turnos, ListaVo *listaTurnos, Fecha a
             } else {
                 Turno t = nuevo_turno(listaTurnos, agenda, listaPacientes);
                 if(t.id_turno != 0) {
-                    agregarTurno(listaTurnos, t);
+                    insertarTurnoOrdenado(listaTurnos, t);
                     printf("\nTurno cargado exitosamente.\n");
                 } else {
                     printf("\nCarga de turno cancelada.\n");
@@ -1004,7 +1025,12 @@ void operaciones_menu_turnos(int subopcion_turnos, ListaVo *listaTurnos, Fecha a
             } while (mes != 1 && mes != 2);
             reset(listaTurnos);
             monto_ingresado = ver_monto_ingresado_mes(*listaTurnos, mes+10);
-            printf("En el mes %d se obtuvo una ganancia de %.2f\n", mes+10, monto_ingresado);
+            if(mes==1){
+                printf("En el mes de Noviembre se obtuvo una ganancia de %.2f\n", monto_ingresado);
+            }else{
+                printf("En el mes de Diciembre se obtuvo una ganancia de %.2f\n", monto_ingresado);
+            }
+
             pausa();
             break;
         }
@@ -1350,7 +1376,7 @@ int cargar_turnos(ListaVo turnos[]) {
         set_turno_fecha(&t, f);
         set_turno_estado(&t, estado);
         if (!turno_existe(*turnos, id)) {
-            agregarTurno(turnos, t);
+            insertarTurnoOrdenado(turnos, t);
             cargados++;
         }
         i++;
