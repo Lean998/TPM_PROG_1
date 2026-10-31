@@ -8,37 +8,30 @@
 #define MAX_PACIENTES 100
 #define MAX_TURNOS 390
 
-//===================== PROTOTIPOS AGUSTIN ======================
-void eliminar_paciente_sin_turnos(ListaEpaciente *listaP, ListaVo listaTurnos, long dniBuscado);
-void mostrar_turnos_por_dni(ListaVo listaTurnos, long dniBuscado);
-void inicializarAgenda(Fecha agenda[MAX_AGENDA]);
-void leer_texto(char *mensaje, char *destino, int tam);
-void cargar_paciente_teclado(ListaEpaciente *lista);
+//===================== PROTOTIPOS GENERALES ======================
 void modificar_nombre_paciente(Paciente *p, char *nuevo_nombre);
 void modificar_apellido_paciente(Paciente *p, char *nuevo_apellido);
 void modificar_dni_paciente(Paciente *p, long int nuevo_dni);
 void modificar_o_social_paciente(Paciente *p, int nuevo_oSocial);
+int main(void);
 void ver_o_social_paciente(Paciente p);
 void mostrar_datos_paciente(Paciente p);
+
+//===================== PROTOTIPOS AGUSTIN ======================
+void eliminar_paciente_sin_turnos(ListaEpaciente *listaP, ListaVo listaTurnos, long dniBuscado);
+void mostrar_turnos_por_dni(ListaVo listaTurnos, long dniBuscado);
+void inicializarAgenda(Fecha agenda[MAX_AGENDA]);
+void cargar_paciente_teclado(ListaEpaciente *lista);
 void mostrar_todos_los_pacientes(ListaEpaciente *lista);
 void carga_n_turnos(ListaVo *listaT, Fecha agenda[], ListaEpaciente *listaP, int n);
-void modificar_id_turno(ListaVo listaT, Turno *t, int nuevo_id);
-void modificar_dni_turno(Turno *t, ListaEpaciente listaP, long int nuevo_dni);
-void modificar_monto_turno(Turno *t, float nuevo_monto);
-void modificar_mutual_turno(Turno *t, int nuevo_mutual);
-void modificar_fecha_turno(Turno *t, Fecha nueva_fecha, Fecha agenda[], int tamanio_agenda);
-void modificar_estado_turno(Turno *t, int nuevo_estado);
-void ver_o_social_turno(Turno t);
-void mostrar_turnos_reservados(ListaVo lista, int* pagina);
-void ver_estado_turno(Turno t);
-void ver_datos_turno(Turno t);
-void ver_fecha(Fecha f);
 int fecha_valida(Fecha f);
 int fecha_disponible(Fecha f, int tamanio_agenda, Fecha agenda[]);
 int indice_fecha(Fecha f, int tamanio_agenda, Fecha agenda[]);
-int main(void);
-void mostrar_menu(void);
-void pausa(void);
+int buscarPacientePorDni(ListaEpaciente e, long dniBuscado);
+
+
+//===================== PROTOTIPOS LEAN ======================
+int turno_existe(ListaVo turnos, int id_turno);
 void ver_turnos_asignados_mes(ListaVo listaTurnos, int mes);
 int contar_turnos_atendidos_mes_dia(ListaVo listaTurnos, int dia, int mes);
 float ver_monto_ingresado_mes(ListaVo listaTurnos, int mes);
@@ -48,8 +41,17 @@ void guardar_turnos(ListaVo turnos[]);
 int cargar_turnos(ListaVo turnos[]);
 void guardar_agenda(Fecha agenda[]);
 int cargar_agenda(Fecha agenda[]);
-int buscarPacientePorDni(ListaEpaciente e, long dniBuscado);
-int turno_existe(ListaVo turnos, int id_turno);
+void ver_fecha(Fecha f);
+void leer_texto(char *mensaje, char *destino, int tam);
+void mostrar_menu_pacientes();
+void operaciones_menu_pacientes(int subopcion_pacientes, ListaEpaciente* listaPacientes, ListaVo* listaTurnos);
+void mostrar_menu_turnos();
+void operaciones_menu_turnos(int subopcion_turnos, ListaVo *listaTurnos, Fecha agenda[], ListaEpaciente *listaPacientes, int* pagina_turnos);
+void mostrar_menu_fechas();
+void operaciones_menu_fechas(int subopcion_fechas, Fecha agenda[]);
+void mostrar_menu_persistencias(ListaVo* listaTurnos, ListaEpaciente* listaPacientes, Fecha agenda[]);
+void mostrar_menu(void);
+void pausa(void);
 
 //===================== PROTOTIPOS EZE ======================
 Turno nuevo_turno(ListaVo *listaT, Fecha agenda[], ListaEpaciente *listaP);
