@@ -114,7 +114,7 @@ int turno_existe(ListaVo turnos, int id_turno){
     return 0;
 }
 
-//Eze: "Devuelve una copia del turno buscado por su ID. Si no existe, devuelve un turno con ID 0."
+//Eze: devuelve una copia del turno buscado por su ID. Si no existe, devuelve un turno con ID 0.
 Turno obtenerTurnoPorId(ListaVo lista, int id_buscar) {
     Turno tError;
     set_turno_id(&tError, 0); // Usamos ID 0 como bandera de que no se encontro
@@ -173,7 +173,7 @@ void cargar_paciente_teclado(ListaEpaciente *listaP) {
         }
     } while (dni < 10000000 || dni > 99999999);
 
-    // Eze: "Preguntamos SOLAMENTE si tiene Obra Social (1 = Si, 0 = No)"
+    // Eze: preguntamos SOLAMENTE si tiene Obra Social (1 = Si, 0 = No)
     do {
         printf("\n El paciente posee Obra Social? [1] Si  [0] No: ");
         scanf("%d", &oSocial);
@@ -320,7 +320,7 @@ void modificar_o_social_paciente(Paciente *p, int nuevo_oSocial) {
 
 
 
-// Eze: "Guardamos los punteros que devuelven los getters para poder hacerles free() despues"
+// Eze: guardamos los punteros que devuelven los getters para poder hacerles free() despues
 void mostrar_datos_paciente(Paciente p) {
     char *n = get_nombre_paciente(p);
     char *a = get_apellido_paciente(p);
